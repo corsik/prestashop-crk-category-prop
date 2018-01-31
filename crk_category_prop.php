@@ -55,7 +55,7 @@ class crk_category_prop extends Module
         {
             $res = Db::getInstance()->execute('
                     CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.$this->table_name.'` (
-                    `id_category` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+                    `id_category` INT UNSIGNED NOT NULL,
                     `property` TEXT DEFAULT NULL,
                     PRIMARY KEY (`id_category`)
                 ) ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8 ;'
