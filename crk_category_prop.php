@@ -123,6 +123,7 @@ class crk_category_prop extends Module {
         } elseif (Tools::isSubmit('delete' . $this->name)) {
             $objProperty = new categoryProperty((int) $id_property);
             $objProperty->delete();
+            $this->deleteProperty('id_property = '.$id_property);
             $this->_clearCache('*');
             Tools::redirectAdmin(AdminController::$currentIndex.'&configure='.$this->name.'&token='.Tools::getAdminTokenLite('AdminModules'));
         } else {
@@ -133,6 +134,9 @@ class crk_category_prop extends Module {
             return $html . $helper->generateList($content, $this->fields_list);
         }
 
+//        if(Tools::isSubmit("saveProperty")){
+//            $this->setProperty();
+//        }
     }
 
     protected function initForm() {
@@ -299,6 +303,10 @@ class crk_category_prop extends Module {
         }
     }
 
+    public function deleteProperty($where) {
+        return Db::getInstance()->delete($this->table_properties, $where);
+    }
+
     public function getLangProperties() {
         return Db::getInstance()->executeS('SELECT * FROM `' . _DB_PREFIX_ . $this->table_lang_properties . '`');
     }
@@ -314,6 +322,13 @@ class crk_category_prop extends Module {
 
         return Db::getInstance()->executeS($sql);
     }
+
+//    public function getProperty($id_category, $id_property) {
+//        $sql = 'SELECT * FROM `' . _DB_PREFIX_ . $this->table_properties . '` WHERE `id_category` = "' . (int) $id_category . '"';
+//        if(isset($id_property) && strlen($id_property) > 1)
+//            $sql .= ' AND `id_property` = "' . $id_property . '"';
+//        return Db::getInstance()->executeS($sql);
+//    }
 
     public function hookCategoryAddition($params) {
         $this->properties = $this->getLangProperty(['id_category' => Tools::getValue('id_category')], true);
@@ -341,6 +356,7 @@ class crk_category_prop extends Module {
     public function hookDisplayBackOfficeCategory($params) {
         $this->properties = $this->getLangProperty(['id_category' => Tools::getValue('id_category')], true);
         $this->context->smarty->assign(['arrProperty' => $this->properties]);
+//        $form = $this->initFromEditCategory();
 
         return $this->display(__FILE__, 'backoffice.tpl');
     }
