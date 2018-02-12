@@ -7,6 +7,7 @@ require_once _PS_MODULE_DIR_ . 'crk_category_prop/classes/categoryProperty.php';
 
 class crk_category_prop extends Module {
 
+    private $templateFile;
     protected $_errors = array();
     protected $_html = '';
     public $table_properties = 'category_property';
@@ -18,7 +19,6 @@ class crk_category_prop extends Module {
         $this->name = 'crk_category_prop';
         $this->tab = 'front_office_features';
         $this->version = '1.0';
-        $this->table = 'category';
         $this->author = 'corsik';
         $this->need_instance = 0;
 
@@ -30,37 +30,35 @@ class crk_category_prop extends Module {
         $this->description = $this->l('Displays an additional field');
 
         $this->ps_versions_compliancy = array('min' => '1.7.2.0', 'max' => _PS_VERSION_);
+
+        $this->templateFile = 'module:crk_category_prop/views/templates/hook/backoffice.tpl';
     }
 
     public function install() {
-        if (!parent::install() ||
-                !$this->installDB() ||
-                !$this->registerHook('displayBackOfficeCategory') ||
-                !$this->registerHook('categoryAddition') ||
-                !$this->registerHook('categoryUpdate') ||
-                !$this->registerHook('filterCategoryContent') ||
-                !$this->registerHook('filterProductContent')
-        )
-            return false;
-        return true;
+        return  parent::install() &&
+                $this->installDB() &&
+                $this->registerHook('displayBackOfficeCategory') &&
+                $this->registerHook('categoryAddition') &&
+                $this->registerHook('categoryUpdate') &&
+                $this->registerHook('filterCategoryContent') &&
+                $this->registerHook('filterProductContent')
+        ;
     }
 
     public function uninstall() {
-        if (!parent::uninstall() ||
-                !$this->uninstallDB() ||
-                !$this->unregisterHook('displayBackOfficeCategory') ||
-                !$this->unregisterHook('categoryAddition') ||
-                !$this->unregisterHook('categoryUpdate') ||
-                !$this->unregisterHook('filterCategoryContent') ||
-                !$this->unregisterHook('filterProductContent')
-        )
-            return false;
-        return true;
+        return  parent::uninstall() &&
+                $this->uninstallDB() &&
+                $this->unregisterHook('displayBackOfficeCategory') &&
+                $this->unregisterHook('categoryAddition') &&
+                $this->unregisterHook('categoryUpdate') &&
+                $this->unregisterHook('filterCategoryContent') &&
+                $this->unregisterHook('filterProductContent')
+        ;
     }
 
     public function installDB() {
         $return = true;
-        $res &= Db::getInstance()->execute('
+        $return &= Db::getInstance()->execute('
                     CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . $this->table_properties . '` (
                     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
                     `id_category` INT NOT NULL,
@@ -70,13 +68,13 @@ class crk_category_prop extends Module {
                 ) ENGINE=' . _MYSQL_ENGINE_ . ' DEFAULT CHARSET=utf8 ;'
         );
 
-        $res &= Db::getInstance()->execute('
+        $return &= Db::getInstance()->execute('
                     CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . $this->table_lang_properties . '` (
                     `id_property` INT UNSIGNED NOT NULL AUTO_INCREMENT,
                     `id_category` INT NOT NULL,
                     `property_type` VARCHAR(255) NOT NULL,
                     `property_lang` VARCHAR(255) NOT NULL,
-                    PRIMARY KEY (`id`)
+                    PRIMARY KEY (`id_property`)
                 ) ENGINE=' . _MYSQL_ENGINE_ . ' DEFAULT CHARSET=utf8 ;'
         );
         return $return;
@@ -114,10 +112,11 @@ class crk_category_prop extends Module {
             if (isset($id_property) && $id_property > 0) {
                 $objProperty = new categoryProperty((int) $id_property);
                 $this->fields_form[0]['form']['input'][] = array('type' => 'hidden', 'name' => 'id_property');
-                $helper->fields_value['id_property'] = $id_property;
-                $helper->fields_value['property_lang'] = $objProperty->property_lang;
-                $helper->fields_value['property_type'] = $objProperty->property_type;
             }
+
+            $helper->fields_value['id_property'] = (isset($id_property) && $id_property > 0)?$id_property:"";
+            $helper->fields_value['property_lang'] = (isset($id_property) && $id_property > 0)?$objProperty->property_lang:"";
+            $helper->fields_value['property_type'] = (isset($id_property) && $id_property > 0)?$objProperty->property_type:"";
 
             return $html . $helper->generateForm($this->fields_form);
         } elseif (Tools::isSubmit('delete' . $this->name)) {
@@ -153,7 +152,6 @@ class crk_category_prop extends Module {
                 array(
                     'type' => 'text',
                     'label' => $this->trans('Text', array(), 'Admin.Global'),
-                    'lang' => false,
                     'name' => 'property_lang',
                     'cols' => 40,
                     'rows' => 10
@@ -338,7 +336,7 @@ class crk_category_prop extends Module {
             $arrSet = [
                 'id_category' => (int) $params['category']->id,
                 'id_property' => (int) $prop['id_property'],
-                'property_value' => pSQL(Tools::getValue('property_' . $prop['id_property']))
+                'property_value' => Tools::getValue('property_' . $prop['id_property'])
             ];
 
             if (strlen($prop['property_value'])> 0) {

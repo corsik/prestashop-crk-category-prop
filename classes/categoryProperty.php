@@ -1,12 +1,11 @@
 <?php
 
-class categoryProperty extends ObjectModel {
-
+class categoryProperty extends ObjectModel
+{
     public $id;
     public $id_category;
     public $property_type;
     public $property_lang;
-
     /**
      * @see ObjectModel::$definition
      */
@@ -20,7 +19,8 @@ class categoryProperty extends ObjectModel {
             'property_lang' => array('type' => self::TYPE_STRING, 'validate' => 'isString', 'required' => true),
         )
     );
-    public function copyFromPost()
+
+    public function copyFromPost ()
     {
         /* Classical fields */
         foreach ($_POST as $key => $value) {
@@ -29,5 +29,4 @@ class categoryProperty extends ObjectModel {
             }
         }
     }
-
 }
