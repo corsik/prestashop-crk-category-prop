@@ -36,7 +36,7 @@ class crk_category_prop extends Module {
 
     public function install() {
         return parent::install() &&
-//                $this->installDB() &&
+                $this->installDB() &&
                 $this->registerHook('displayBackOfficeCategory') &&
                 $this->registerHook('categoryAddition') &&
                 $this->registerHook('categoryUpdate') &&
@@ -46,7 +46,7 @@ class crk_category_prop extends Module {
 
     public function uninstall() {
         return parent::uninstall() &&
-//                $this->uninstallDB() &&
+                $this->uninstallDB() &&
                 $this->unregisterHook('displayBackOfficeCategory') &&
                 $this->unregisterHook('categoryAddition') &&
                 $this->unregisterHook('categoryUpdate') &&
