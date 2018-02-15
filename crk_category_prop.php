@@ -417,18 +417,23 @@ class crk_category_prop extends Module {
     }
 
     public function hookFilterCategoryContent(&$params) {
-        $arrProperty = $this->getPropertiesCategory($params['object']['id'], false);
-        if (boolval($arrProperty))
-            $params['object']['property'] = $arrProperty;
+        $arrProperty = $this->getLangProperty(['id_category' => $params['object']['id']], true);
+        if(!empty($arrProperty)){
+            foreach ($arrProperty as $value) {
+                $params['object']['property'][$value['property_code']] = $value['property_value'];
+            }
+        }
 
         return $params;
     }
 
     public function hookFilterProductContent(&$params) {
-        $arrProperty = $this->getPropertiesCategory($params['object']['id_category_default'], false);
-        if (boolval($arrProperty))
-            $params['object']['category_property'] = $arrProperty;
-
+        $arrProperty = $this->getLangProperty(['id_category' => $params['object']['id_category_default']], true);
+        if(!empty($arrProperty)){
+            foreach ($arrProperty as $value) {
+                $params['object']['category_property'][$value['property_code']] = $value['property_value'];
+            }
+        }
         return $params;
     }
 
