@@ -163,7 +163,7 @@ class crk_category_prop extends Module {
                 ),
                 array(
                     'type' => 'select',
-                    'label' => $this->l('Type'),
+                    'label' => $this->l('Type field'),
                     'name' => 'property_type',
                     'multiple' => false,
                     'options' => array(
@@ -264,7 +264,7 @@ class crk_category_prop extends Module {
                 'orderby' => false
             ),
             'property_type' => array(
-                'title' => $this->l('Category type'),
+                'title' => $this->l('Type field'),
                 'width' => 140,
                 'type' => 'text',
                 'search' => false,
@@ -359,7 +359,7 @@ class crk_category_prop extends Module {
         return Db::getInstance()->executeS($sql);
     }
 
-    public function getBackOfficeProperty($params) {
+    public function getBackOfficeProperty() {
         $arrProperty = [];
         $id_category = Tools::getValue('id_category');
         $id_parent = categoryProperty::getParentCategory($id_category);
